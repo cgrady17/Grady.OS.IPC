@@ -1,6 +1,4 @@
 #include <stdio.h>
-#include <limits.h>
-#include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
 
@@ -29,12 +27,11 @@ int main() {
     }
 
     // Create Child 1
-    c1 = fork();
-    if (c1 < 0) {
+    if ((c1 = fork()) < 0) {
         // Fork failed
         fprintf(stderr, "Fork failed.\n");
         return EXIT_FAILURE;
-    } else if (c1 == 0) {
+    } else if (c1 >= 0) {
         // CHILD 1
         // Output the process id
         printf("Child 1 PID: %d\n", getpid());
@@ -56,7 +53,7 @@ int main() {
     } else if ((c2 = fork()) < 0) {
         fprintf(stderr, "Fork failed.\n");
         return EXIT_FAILURE;
-    } else if (c2 == 0) {
+    } else if (c2 >= 0) {
         // CHILD 2
         printf("Child 2 PID: %d\n", getpid());
         close(filedes1[0]);
