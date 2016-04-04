@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <wait.h>
 
 int main() {
 
@@ -31,7 +32,7 @@ int main() {
         // Fork failed
         fprintf(stderr, "Fork failed.\n");
         return EXIT_FAILURE;
-    } else if (c1 >= 0) {
+    } else if (c1 == 0) {
         // CHILD 1
         // Output the process id
         printf("Child 1 PID: %d\n", getpid());
@@ -40,20 +41,21 @@ int main() {
         fd = fopen("c1file", "w");
         close(filedes1[1]);
         close(filedes2[0]);
+        close(filedes2[1]);
 
         for (int i = 0; i < 25; i++) {
             // Read data from filedes1
             read(filedes1[0], (char *)&data, sizeof(int));
 
             // Output value of data
-            printf("Received %d\n", data);
+            fprintf(fd, "Received %d\n", data);
         }
 
         return EXIT_SUCCESS;
     } else if ((c2 = fork()) < 0) {
         fprintf(stderr, "Fork failed.\n");
         return EXIT_FAILURE;
-    } else if (c2 >= 0) {
+    } else if (c2 == 0) {
         // CHILD 2
         printf("Child 2 PID: %d\n", getpid());
         close(filedes1[0]);
@@ -88,14 +90,18 @@ int main() {
 
     // Close other ends of pipes
     close(filedes1[0]);
+    close(filedes1[1]);
     close(filedes2[0]);
 
     // Loop 25 times
     for (int i = 0; i < 25; i++) {
         // Output value of i
-        printf("Sending %d\n", i);
+        fprintf(fd, "Sending %d\n", i);
 
         // Write value of i
         write(filedes2[1], (void *)&i, sizeof(int));
     }
+
+    waitpid(c1, NULL, 0);
+    waitpid(c2, NULL, 0);
 }
