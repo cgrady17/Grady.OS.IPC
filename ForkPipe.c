@@ -41,7 +41,7 @@ int main() {
 
         // Open a file for writing
         fd = fopen("c1file", "w");
-        close(filedes1[0]);
+        close(filedes1[1]);
         close(filedes2[0]);
 
         for (int i = 0; i < 25; i++) {
@@ -60,7 +60,7 @@ int main() {
         // CHILD 2
         printf("Child 2 PID: %d\n", getpid());
         close(filedes1[0]);
-        close(filedes2[0]);
+        close(filedes2[1]);
 
         // Open the file for writing
         fd = fopen("c2file", "w");
@@ -71,7 +71,7 @@ int main() {
             read(filedes2[0], (char *)&data, sizeof(int));
             // Output value of data being received
             fprintf(fd, "Received %d\n", data);
-            // Incrememt data by 5
+            // Increment data by 5
             data = data + 5;
             // Output value of data being sent
             fprintf(fd, "Sending %d\n", data);
